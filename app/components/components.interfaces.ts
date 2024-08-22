@@ -1,7 +1,7 @@
-interface Pacman {
-    draw(): void;
+interface IPacman {
+    draw(ctx: CanvasRenderingContext2D): void;
     move(): void;
-    changeDirection(): void;
+    changeDirection(direction: string): void;
     checkCollision(): void;
     checkForWin(): void;
 }

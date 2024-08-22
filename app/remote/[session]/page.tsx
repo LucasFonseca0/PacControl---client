@@ -13,16 +13,14 @@ export default function RemoteControl({ params }: { params: { session: string } 
 
     console.log('Conectado ao WebSocket com sessionId:', params.session);
 
-    // Envia um evento ao iniciar o controle remoto
     socket.emit('startGame', { sessionId: params.session });
 
-    // Escuta os eventos enviados pelo backend
     socket.on('gameAction', (action) => {
       console.log(`Ação recebida: ${action}`);
     });
 
     return () => {
-      socket.disconnect(); // Desconecta ao desmontar o componente
+      socket.disconnect(); 
     };
   }, [params.session]);
 

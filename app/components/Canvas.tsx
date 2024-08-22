@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+import { Pacman } from "./gameComponents/pacman";
 
 const MyCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -7,7 +8,7 @@ const MyCanvas = () => {
   const canvasWidth = blockSize * 21;
   const canvasHeight = blockSize * 23;
   const blank_space = blockSize * 0.7;
-  const fps = 30; // Set the desired frames per second
+  const fps = 30;
 
   const pacmanMap = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -39,6 +40,8 @@ const MyCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
     let animationFrameId: number;
+
+    const pacman = new Pacman(blockSize * 1.5, blockSize * 1.5, blockSize,pacmanMap);
 
     const render = () => {
       if (ctx) {
@@ -100,6 +103,9 @@ const MyCanvas = () => {
             }
           });
         });
+        pacman.draw(ctx)
+        pacman.move()
+
 
         animationFrameId = requestAnimationFrame(render);
       }
@@ -110,6 +116,8 @@ const MyCanvas = () => {
 
     const frameController = (time: number) => {
       if (time - lastTime >= interval) {
+        pacman.move()
+
         render();
         lastTime = time;
       } else {
@@ -119,10 +127,32 @@ const MyCanvas = () => {
 
     animationFrameId = requestAnimationFrame(frameController);
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "ArrowUp":
+          pacman.changeDirection("up");
+          break;
+        case "ArrowDown":
+          pacman.changeDirection("down");
+          break;
+        case "ArrowLeft":
+          pacman.changeDirection("left");
+          break;
+        case "ArrowRight":
+          pacman.changeDirection("right");
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
     return () => {
       cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+
 
   return <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />;
 };

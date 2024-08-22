@@ -30,7 +30,6 @@ export default function Home() {
       setGameStarted(true);
     });
 
-    // Adiciona a escuta ao evento pong
     newSocket.on("gameAction", (data) => {
       console.log("Resposta do backend (pong):", data);
     });
