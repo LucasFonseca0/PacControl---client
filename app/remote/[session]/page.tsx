@@ -10,12 +10,18 @@ import {
   ArrowRightIcon,
 } from '@heroicons/react/20/solid'
 
-export default function RemoteControl({ params }: { params: { session: string } }) {
+export default function RemoteControl({
+  params,
+}: {
+  params: { session: string }
+}) {
   const socketRef = useRef<Socket | null>(null)
   const joystickRef = useRef<HTMLDivElement>(null)
 
+  const serverURL = process.env.NEXT_PUBLIC_SERVER_URL
+
   useEffect(() => {
-    const socket = io('http://localhost:3001', {
+    const socket = io(serverURL, {
       withCredentials: true,
       query: { sessionId: params.session },
       transports: ['websocket'],
@@ -34,7 +40,7 @@ export default function RemoteControl({ params }: { params: { session: string } 
     return () => {
       socket.disconnect()
     }
-  }, [params.session])
+  }, [params.session, serverURL])
 
   useEffect(() => {
     if (joystickRef.current) {
@@ -59,7 +65,10 @@ export default function RemoteControl({ params }: { params: { session: string } 
   }, [])
 
   const handleAction = (direction: string) => {
-    if (socketRef.current && ['up', 'down', 'left', 'right'].includes(direction)) {
+    if (
+      socketRef.current &&
+      ['up', 'down', 'left', 'right'].includes(direction)
+    ) {
       socketRef.current.emit('control', {
         action: direction,
         sessionId: params.session,

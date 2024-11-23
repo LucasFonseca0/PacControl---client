@@ -11,7 +11,7 @@ export const getGameConfig = ({ pacmanMap }: { pacmanMap: number[][] }) => {
     },
     ghost: {
       maxGhosts: 4,
-      speed: blockSize / 2,
+      speed: blockSize / 32,
       vulnerableTime: 600,
     },
     pacman: {

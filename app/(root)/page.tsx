@@ -14,9 +14,14 @@ export default function Home() {
   const [sessionId] = useState(uuidv4())
   const [socket, setSocket] = useState<any>(null)
   const [gameAction, setGameAction] = useState<Actions>('right')
+  
+  const serverURL = process.env.NEXT_PUBLIC_SERVER_URL;
+  const clientURL = process.env.NEXT_PUBLIC_CLIENT_URL;
+  
+  console.log(clientURL,serverURL)
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3001', {
+    const newSocket = io(serverURL, {
       query: { sessionId },
       withCredentials: true,
       transports: ['websocket'],
@@ -26,7 +31,7 @@ export default function Home() {
 
     newSocket.on('connect', () => {
       console.log('Conectado ao WebSocket com sessionId:', sessionId)
-      console.log('Link:', `http://localhost:3000/remote/${sessionId}`)
+      console.log('Link:', `${clientURL}/remote/${sessionId}`)
     })
 
     newSocket.on('gameStarted', () => {
@@ -46,7 +51,7 @@ export default function Home() {
     return () => {
       newSocket.disconnect()
     }
-  }, [sessionId])
+  }, [sessionId,serverURL])
 
   return (
     <ArcadeBackground>
@@ -56,7 +61,7 @@ export default function Home() {
             <h1 className="text-2xl font-bold mb-4 text-white">
               Escaneie o QR Code para começar o jogo
             </h1>
-            <QRCode value={`http://localhost:3000/remote/${sessionId}`} className='m-auto'  size={300}/>
+            <QRCode value={`${clientURL}/remote/${sessionId}`} className='m-auto'  size={300}/>
           </div>
         ) : (
           <div className="text-center">
