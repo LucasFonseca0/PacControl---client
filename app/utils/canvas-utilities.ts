@@ -4,13 +4,19 @@ import { Pellets } from '../components/game-components/pellets'
 
 export const findAvailableSpawnPoints = (map: number[][]) => {
   const spawnPoints: { x: number; y: number }[] = []
-  for (const [rowIndex, row] of map.entries()) {
-    for (const [colIndex, cell] of row.entries()) {
+
+  let rowIndex = 0
+  for (const row of map) {
+    let colIndex = 0
+    for (const cell of row) {
       if (cell === 4) {
         spawnPoints.push({ x: colIndex, y: rowIndex })
       }
+      colIndex++
     }
+    rowIndex++
   }
+
   return spawnPoints
 }
 
@@ -27,11 +33,13 @@ export const generateGhosts = (
 
   const spawnPoints = availableSpawnPoints.slice(0, numGhosts)
 
-  for (const [i, spawnPoint] of spawnPoints.entries()) {
-    const color = ghostColors[i % ghostColors.length]
+  let index = 0
+  for (const spawnPoint of spawnPoints) {
+    const color = ghostColors[index % ghostColors.length]
     ghosts.push(
       new Ghost(blockSize, map, color, spawnPoint, ghostSpeed, vulnerableTime)
     )
+    index++
   }
 
   return ghosts
@@ -114,13 +122,13 @@ export const passLevel = ({
   level: number
   levels: LevelsType[]
   setConfig: (config: any) => void
-  setLevel: (level: number) => void
+  setLevel: (level: any) => void
 }) => {
   if (level < levels.length - 1) {
     setConfig((prev) => ({
       ...prev,
       ...levels[level + 1],
     }))
-    setLevel((prev) => prev + 1)
+    setLevel((prev:number) => prev + 1)
   }
 }
