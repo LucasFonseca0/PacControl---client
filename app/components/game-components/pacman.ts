@@ -42,12 +42,16 @@ export class Pacman implements IPacman {
   }
 
   private findSpawnPosition(map: number[][]): { x: number; y: number } | null {
-    for (const [rowIndex, row] of map.entries()) {
-      for (const [colIndex, cell] of row.entries()) {
+    let rowIndex = 0
+    for (const row of map) {
+      let colIndex = 0
+      for (const cell of row) {
         if (cell === 5) {
           return { x: colIndex, y: rowIndex }
         }
+        colIndex++
       }
+      rowIndex++
     }
     return null
   }
@@ -116,7 +120,7 @@ export class Pacman implements IPacman {
   private calculateDistanceToWall(direction: Direction): number {
     const halfSize = this.size / 2
     const tolerance = this.size * 0.01
-    let distance = Infinity
+    let distance = Number.POSITIVE_INFINITY
 
     switch (direction) {
       case 'right': {
@@ -278,10 +282,10 @@ export class Pacman implements IPacman {
     const tolerance = 1
     const dir = direction ?? this.direction
 
-    let frontLeftX: number,
-      frontLeftY: number,
-      frontRightX: number,
-      frontRightY: number
+    let frontLeftX: number
+    let frontLeftY: number
+    let frontRightX: number
+    let frontRightY: number
 
     switch (dir) {
       case 'right':

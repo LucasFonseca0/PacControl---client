@@ -129,7 +129,10 @@ export class Ghost implements IGhost {
       }
       spriteXBase = colorSpriteXMap[this.color] || 0
 
-      const directionOffsets: Record<Direction, { spriteY: number; offsetX: number }> = {
+      const directionOffsets: Record<
+        Direction,
+        { spriteY: number; offsetX: number }
+      > = {
         up: { spriteY: this.frame < 30 ? 0 : 1, offsetX: 1 },
         down: { spriteY: this.frame < 30 ? 0 : 1, offsetX: 0 },
         left: { spriteY: this.frame < 30 ? 2 : 3, offsetX: 0 },
@@ -143,11 +146,19 @@ export class Ghost implements IGhost {
 
     const sourceX = Math.floor(
       spriteXBase * spriteWidth +
-        ((spriteXBase > 0 && spriteXBase < totalColumns) ? ((spriteY % 1 === 0) ? spacingX : -spacingX) : 0)
+        (spriteXBase > 0 && spriteXBase < totalColumns
+          ? spriteY % 1 === 0
+            ? spacingX
+            : -spacingX
+          : 0)
     )
     const sourceY = Math.floor(
       spriteY * spriteHeight +
-        ((spriteY > 0 && spriteY < totalRows) ? ((spriteY % 1 === 0) ? spacingY : -spacingY) : 0)
+        (spriteY > 0 && spriteY < totalRows
+          ? spriteY % 1 === 0
+            ? spacingY
+            : -spacingY
+          : 0)
     )
 
     ctx.drawImage(
@@ -400,9 +411,11 @@ export class Ghost implements IGhost {
 
   private alignWithGrid(): void {
     this.x =
-      Math.round((this.x - this.halfSize) / this.size) * this.size + this.halfSize
+      Math.round((this.x - this.halfSize) / this.size) * this.size +
+      this.halfSize
     this.y =
-      Math.round((this.y - this.halfSize) / this.size) * this.size + this.halfSize
+      Math.round((this.y - this.halfSize) / this.size) * this.size +
+      this.halfSize
   }
 
   private canTurn(direction: Direction): boolean {
@@ -421,16 +434,17 @@ export class Ghost implements IGhost {
 
   private findNearestBasePosition(): { mapX: number; mapY: number } {
     const basePositions: { x: number; y: number }[] = []
-    for (const [rowIndex, row] of this.map.entries()) {
-      for (const [colIndex, cell] of row.entries()) {
+
+    this.map.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
         if (cell === 4) {
           basePositions.push({ x: colIndex, y: rowIndex })
         }
-      }
-    }
+      })
+    })
 
     let nearestPosition = basePositions[0]
-    let minDistance = Infinity
+    let minDistance = Number.POSITIVE_INFINITY
 
     for (const position of basePositions) {
       const distance = Math.hypot(
@@ -525,10 +539,22 @@ export class Ghost implements IGhost {
     const tolerance = 0.02 * this.stepSize
 
     const positions = [
-      { x: newX - this.halfSize + tolerance, y: newY - this.halfSize + tolerance },
-      { x: newX + this.halfSize - tolerance, y: newY - this.halfSize + tolerance },
-      { x: newX - this.halfSize + tolerance, y: newY + this.halfSize - tolerance },
-      { x: newX + this.halfSize - tolerance, y: newY + this.halfSize - tolerance },
+      {
+        x: newX - this.halfSize + tolerance,
+        y: newY - this.halfSize + tolerance,
+      },
+      {
+        x: newX + this.halfSize - tolerance,
+        y: newY - this.halfSize + tolerance,
+      },
+      {
+        x: newX - this.halfSize + tolerance,
+        y: newY + this.halfSize - tolerance,
+      },
+      {
+        x: newX + this.halfSize - tolerance,
+        y: newY + this.halfSize - tolerance,
+      },
     ]
 
     return positions.some(({ x, y }) => this.isWallAtPosition(x, y))
