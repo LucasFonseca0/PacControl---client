@@ -1,160 +1,288 @@
-import React, { useRef, useEffect } from "react";
-import { Pacman } from "./gameComponents/pacman";
+import React, { useRef, useEffect, useState, useCallback } from 'react'
+import { Pacman } from './game-components/pacman'
+import { Pellets } from './game-components/pellets'
+import { mapDrawer } from './game-components/map-drawer'
+import { Ghost } from './game-components/ghost'
+import { defaultPacmanMap } from './maps/pacman-maps'
+import { getGameConfig, levels } from '../configs/game.config'
+import {
+  drawGameOver,
+  drawScoreAndLives,
+  initializeGameObjects,
+  passLevel,
+} from '../utils/canvas-utilities'
 
-const MyCanvas = () => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+type Actions = 'left' | 'right' | 'up' | 'down'
 
-  const blockSize = 32;
-  const canvasWidth = blockSize * 21;
-  const canvasHeight = blockSize * 23;
-  const blank_space = blockSize * 0.7;
-  const fps = 30;
+interface MyCanvasProps {
+  onGameAction?: Actions
+}
 
-  const pacmanMap = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
-    [1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1],
-    [1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1],
-    [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
-    [1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1],
-    [1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1],
-    [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 3, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1],
-    [2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2],
-    [1, 1, 1, 1, 1, 2, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 1, 2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1],
-    [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
-    [1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1],
-    [1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1],
-    [1, 1, 2, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2, 2, 1, 1],
-    [1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1],
-    [1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1],
-    [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  ];
+const MyCanvas: React.FC<MyCanvasProps> = ({ onGameAction }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+
+  const [config, setConfig] = useState(
+    getGameConfig({ pacmanMap: defaultPacmanMap })
+  )
+
+  const {
+    general: {
+      blockSize,
+      canvasWidth,
+      canvasHeight,
+      blankSpace,
+      fps,
+      lives: initialLives,
+    },
+    ghost: { maxGhosts, speed: ghostSpeed, vulnerableTime },
+    pacman: { speed: pacmanSpeed },
+    scoring,
+  } = config
+
+  const [score, setScore] = useState(0)
+  const [level, setLevel] = useState(1)
+  const [lives, setLives] = useState(initialLives)
+  const [bestScore, setBestScore] = useState(() => {
+    const savedBestScore = localStorage.getItem('bestScore')
+    return savedBestScore ? Number(savedBestScore) : 0
+  })
+
+  const livesRef = useRef(lives)
+  const scoreRef = useRef(score)
+  const bestScoreRef = useRef(bestScore)
+  const pacmanRef = useRef<Pacman | null>(null)
+  const ghostsRef = useRef<Ghost[]>([])
+  const pelletsRef = useRef<Pellets | null>(null)
+  const animationFrameIdRef = useRef<number | null>(null)
+  const renderRef = useRef<() => void>()
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    let animationFrameId: number;
+    bestScoreRef.current = bestScore
+  }, [bestScore])
 
-    const pacman = new Pacman(blockSize * 1.5, blockSize * 1.5, blockSize,pacmanMap);
+  useEffect(() => {
+    livesRef.current = lives
+  }, [lives])
 
-    const render = () => {
-      if (ctx) {
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  useEffect(() => {
+    scoreRef.current = score
+  }, [score])
 
-        pacmanMap.forEach((row, i) => {
-          row.forEach((cell, j) => {
-            ctx.fillStyle = cell === 1 ? "blue" : "black";
-            ctx.fillRect(j * blockSize, i * blockSize, blockSize, blockSize);
-
-            const offset = (blockSize - blank_space) / 2;
-            if (cell === 1 && pacmanMap[i][j - 1] === 1) {
-              ctx.fillStyle = "black";
-              ctx.fillRect(
-                j * blockSize - offset,
-                i * blockSize + offset,
-                blockSize,
-                blank_space
-              );
-            }
-            if (cell === 1 && pacmanMap[i][j + 1] === 1) {
-              ctx.fillStyle = "black";
-              ctx.fillRect(
-                j * blockSize + offset,
-                i * blockSize + offset,
-                blockSize,
-                blank_space
-              );
-            }
-            if (cell === 1 && !!pacmanMap[i - 1] && pacmanMap[i - 1][j] === 1) {
-              ctx.fillStyle = "black";
-              ctx.fillRect(
-                j * blockSize + offset,
-                i * blockSize - offset,
-                blank_space,
-                blockSize
-              );
-            }
-            if (cell === 1 && !!pacmanMap[i + 1] && pacmanMap[i + 1][j] === 1) {
-              ctx.fillStyle = "black";
-              ctx.fillRect(
-                j * blockSize + offset,
-                i * blockSize + offset,
-                blank_space,
-                blockSize
-              );
-            }
-            if (cell === 3) {
-              ctx.fillStyle = "pink";
-              ctx.beginPath();
-              ctx.fillRect(
-                j * blockSize ,
-                i * blockSize + blockSize / 2 - blockSize / 8,
-                blockSize,
-                offset
-                
-              );
-              ("");
-            }
-          });
-        });
-        pacman.draw(ctx)
-        pacman.move()
-
-
-        animationFrameId = requestAnimationFrame(render);
+  const handleCollisions = (
+    pacman: Pacman,
+    ghosts: Ghost[],
+    pellets: Pellets
+  ) => {
+    for (const ghost of ghosts) {
+      if (ghost.checkCollisionWithPacman(pacman.x, pacman.y)) {
+        if (ghost.isVulnerable) {
+          setScore((prev) => prev + scoring.ghostPoints)
+          ghost.startReturningToBase()
+        } else if (!ghost.isReturning) {
+          setLives((prev) => prev - 1)
+          pacman.resetPosition()
+          for (const g of ghosts) {
+            g.resetPosition()
+          }
+        }
       }
-    };
+    }
 
-    const interval = 1000 / fps;
-    let lastTime = 0;
+    const pelletConsumed = pellets.checkPelletCollision(pacman.x, pacman.y)
+    if (pelletConsumed) {
+      const points =
+        pelletConsumed === 'power' ? scoring.powerPellet : scoring.normalPellet
+      setScore((prev) => prev + points)
+      if (pelletConsumed === 'power') {
+        for (const ghost of ghosts) {
+          ghost.makeVulnerable()
+        }
+      }
+    }
+  }
+
+  const handleGameOver = (ctx: CanvasRenderingContext2D) => {
+    if (scoreRef.current > bestScoreRef.current) {
+      setBestScore(scoreRef.current)
+      bestScoreRef.current = scoreRef.current
+      localStorage.setItem('bestScore', String(scoreRef.current))
+    }
+
+    drawGameOver(
+      ctx,
+      scoreRef.current,
+      bestScoreRef.current,
+      canvasWidth,
+      canvasHeight
+    )
+    animationFrameIdRef.current = null
+  }
+
+  const resetGame = () => {
+    setLives(initialLives)
+    setScore(0)
+    livesRef.current = initialLives
+    scoreRef.current = 0
+    bestScoreRef.current = bestScore
+    pacmanRef.current?.resetPosition()
+
+    for (const ghost of ghostsRef.current) {
+      ghost.resetPosition()
+      ghost.isVulnerable = false
+      ghost.isReturning = false
+    }
+
+    pelletsRef.current?.reset()
+
+    if (animationFrameIdRef.current === null && renderRef.current) {
+      animationFrameIdRef.current = requestAnimationFrame(renderRef.current)
+    }
+  }
+
+  const render = useCallback(() => {
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext('2d')
+
+    const pacman = pacmanRef.current
+    const ghosts = ghostsRef.current
+    const pellets = pelletsRef.current
+
+    if (ctx && pacman && ghosts && pellets) {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+
+      mapDrawer({
+        pacmanMap: defaultPacmanMap,
+        blankSpace,
+        blockSize,
+        ctx,
+      })
+
+      pellets.draw(ctx)
+
+      const returningGhosts = ghosts.filter((ghost) => ghost.isReturning)
+      const activeGhosts = ghosts.filter((ghost) => !ghost.isReturning)
+
+      for (const ghost of returningGhosts) {
+        ghost.move(pacman.x, pacman.y)
+        ghost.draw(ctx)
+      }
+
+      for (const ghost of activeGhosts) {
+        ghost.move(pacman.x, pacman.y)
+        ghost.draw(ctx)
+      }
+
+      pellets.getQuantity() === 0 &&
+        passLevel({
+          level,
+          levels,
+          setConfig,
+          setLevel,
+        })
+
+      pacman.move()
+      pacman.draw(ctx)
+
+      handleCollisions(pacman, ghosts, pellets)
+
+      drawScoreAndLives(
+        ctx,
+        scoreRef.current,
+        livesRef.current,
+        canvasWidth,
+        canvasHeight
+      )
+
+      if (livesRef.current > 0) {
+        animationFrameIdRef.current = requestAnimationFrame(render)
+      } else {
+        handleGameOver(ctx)
+      }
+    }
+  }, [
+    blankSpace,
+    blockSize,
+    canvasHeight,
+    canvasWidth,
+    scoring.ghostPoints,
+    scoring.normalPellet,
+    scoring.powerPellet,
+    bestScore,
+  ])
+
+  useEffect(() => {
+    const { pacman, pellets, ghosts } = initializeGameObjects(
+      blockSize,
+      defaultPacmanMap,
+      pacmanSpeed,
+      ghostSpeed,
+      vulnerableTime,
+      maxGhosts
+    )
+
+    pacmanRef.current = pacman
+    pelletsRef.current = pellets
+    ghostsRef.current = ghosts
+
+    renderRef.current = render
+
+    let lastTime = 0
+    const interval = 1000 / fps
 
     const frameController = (time: number) => {
       if (time - lastTime >= interval) {
-        pacman.move()
-
-        render();
-        lastTime = time;
+        render()
+        lastTime = time
       } else {
-        animationFrameId = requestAnimationFrame(frameController);
+        animationFrameIdRef.current = requestAnimationFrame(frameController)
       }
-    };
+    }
 
-    animationFrameId = requestAnimationFrame(frameController);
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "ArrowUp":
-          pacman.changeDirection("up");
-          break;
-        case "ArrowDown":
-          pacman.changeDirection("down");
-          break;
-        case "ArrowLeft":
-          pacman.changeDirection("left");
-          break;
-        case "ArrowRight":
-          pacman.changeDirection("right");
-          break;
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
+    animationFrameIdRef.current = requestAnimationFrame(frameController)
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
+      if (animationFrameIdRef.current) {
+        cancelAnimationFrame(animationFrameIdRef.current)
+      }
+    }
+  }, [
+    blockSize,
+    defaultPacmanMap,
+    fps,
+    ghostSpeed,
+    vulnerableTime,
+    pacmanSpeed,
+    render,
+    maxGhosts,
+  ])
 
+  useEffect(() => {
+    if (onGameAction) {
+      if (livesRef.current > 0 && pacmanRef.current) {
+        pacmanRef.current.changeDirection(onGameAction)
+        console.log(level, config)
+      } else if (livesRef.current <= 0) {
+        resetGame()
+      }
+    }
+  }, [onGameAction, initialLives, bestScore])
 
+  return (
+    <div>
+      <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: canvasWidth,
+        }}
+      >
+        <span>Score: {score}</span>
+        <span>Lives: {lives}</span>
+        <span>Level: {level}</span>
+      </div>
+    </div>
+  )
+}
 
-  return <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />;
-};
-
-export default MyCanvas;
+export default MyCanvas

@@ -1,5 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+body {
+    @apply bg-slate-900;
+}
 
+@keyframes noise {
+    0% {
+      transform: translate(0, 0);
+    }
+    10% {
+      transform: translate(-2%, -2%);
+    }
+    20% {
+      transform: translate(2%, 2%);
+    }
+    30% {
+      transform: translate(-1%, 1%);
+    }
+    40% {
+      transform: translate(1%, -1%);
+    }
+    50% {
+      transform: translate(-2%, 2%);
+    }
+    60% {
+      transform: translate(2%, -2%);
+    }
+    70% {
+      transform: translate(-1%, -1%);
+    }
+    80% {
+      transform: translate(1%, 1%);
+    }
+    90% {
+      transform: translate(0%, 0%);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+}
+
+.arcade-screen-effect {
+    background: 
+      radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 50%, transparent 50%);
+    background-size: 4px 4px, 100% 2px;
+    mix-blend-mode: overlay;
+    opacity: 0.15;
+    pointer-events: none;
+    animation: noise 0.3s steps(2) infinite;
+    z-index: 10;
+    height: 100%;
+    width: 100%;
+}
