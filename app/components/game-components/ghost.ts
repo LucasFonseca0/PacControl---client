@@ -58,12 +58,16 @@ export class Ghost implements IGhost {
   }
 
   private findBasePosition(): { x: number; y: number } {
-    for (const [rowIndex, row] of this.map.entries()) {
-      for (const [colIndex, cell] of row.entries()) {
+    let rowIndex = 0
+    for (const row of this.map) {
+      let colIndex = 0
+      for (const cell of row) {
         if (cell === 4) {
           return { x: colIndex, y: rowIndex }
         }
+        colIndex++
       }
+      rowIndex++
     }
     return { x: 0, y: 0 }
   }
