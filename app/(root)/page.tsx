@@ -61,7 +61,7 @@ export default function Home() {
             </h1>
             <QRCode
               value={`${clientURL}/remote/${sessionId}`}
-              className="m-auto"
+              className="m-auto border-2 "
               size={300}
             />
           </div>

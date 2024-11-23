@@ -125,7 +125,7 @@ export const passLevel = ({
   setLevel: (level: any) => void
 }) => {
   if (level < levels.length - 1) {
-    setConfig((prev:any) => ({
+    setConfig((prev: any) => ({
       ...prev,
       ...levels[level + 1],
     }))
