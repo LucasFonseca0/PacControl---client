@@ -129,6 +129,6 @@ export const passLevel = ({
       ...prev,
       ...levels[level + 1],
     }))
-    setLevel((prev:number) => prev + 1)
+    setLevel((prev: number) => prev + 1)
   }
 }
