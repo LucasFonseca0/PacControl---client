@@ -18,7 +18,8 @@ export default function RemoteControl({
   const socketRef = useRef<Socket | null>(null)
   const joystickRef = useRef<HTMLDivElement>(null)
 
-  const serverURL:any = process.env.NEXT_PUBLIC_SERVER_URL!
+  const serverURL = process.env.NEXT_PUBLIC_SERVER_URL as string
+
 
   useEffect(() => {
     const socket = io(serverURL, {
