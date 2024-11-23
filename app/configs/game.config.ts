@@ -11,11 +11,11 @@ export const getGameConfig = ({ pacmanMap }: { pacmanMap: number[][] }) => {
     },
     ghost: {
       maxGhosts: 4,
-      speed: blockSize / 32,
+      speed: blockSize / 2,
       vulnerableTime: 600,
     },
     pacman: {
-      speed: 2, // max: 4
+      speed: 3, 
     },
     scoring: {
       normalPellet: 10,

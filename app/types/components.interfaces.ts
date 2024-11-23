@@ -3,7 +3,6 @@ interface IPacman {
   move(): void
   changeDirection(direction: string): void
   checkCollision(newX: number, newY: number, direction?: Direction): boolean
-  getAngleOffset(): number
 }
 
 type Direction = 'right' | 'left' | 'up' | 'down'

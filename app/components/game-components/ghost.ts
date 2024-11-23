@@ -522,7 +522,7 @@ export class Ghost implements IGhost {
   }
 
   private checkCollision(newX: number, newY: number): boolean {
-    const tolerance = 0.02 * this.size
+    const tolerance = 0.02 * this.stepSize
 
     const positions = [
       { x: newX - this.halfSize + tolerance, y: newY - this.halfSize + tolerance },

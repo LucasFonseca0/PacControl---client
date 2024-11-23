@@ -79,57 +79,184 @@ export class Pacman implements IPacman {
   }
 
   move(): void {
-    const step = this.speed
-    let newX = this.x
-    let newY = this.y
+    const maxDistance = this.speed
+    const distanceToWall = this.calculateDistanceToWall(this.direction)
 
-    switch (this.direction) {
-      case 'right':
-        newX += step
-        break
-      case 'left':
-        newX -= step
-        break
-      case 'up':
-        newY -= step
-        break
-      case 'down':
-        newY += step
-        break
+    const distanceToMove = Math.min(maxDistance, distanceToWall)
+
+    if (distanceToMove > 0) {
+      switch (this.direction) {
+        case 'right':
+          this.x += distanceToMove
+          break
+        case 'left':
+          this.x -= distanceToMove
+          break
+        case 'up':
+          this.y -= distanceToMove
+          break
+        case 'down':
+          this.y += distanceToMove
+          break
+      }
     }
-    if (!this.checkCollision(newX, newY)) {
-      this.x = newX
-      this.y = newY
-    }
+
+    this.alignWithGrid()
 
     if (this.directionToChangeWhenPossible) {
-      const newDirection = this.directionToChangeWhenPossible
-      if (this.checkCollision(newX, newY, newDirection)) return
-      this.directionToChangeWhenPossible = null
-      this.changeDirection(newDirection)
+      if (this.canChangeDirection(this.directionToChangeWhenPossible)) {
+        this.direction = this.directionToChangeWhenPossible
+        this.directionToChangeWhenPossible = null
+      }
     }
 
     this.wrapAround()
   }
 
-  private wrapAround(): void {
-    if (this.x > this.map[0].length * this.size) {
-      this.x = 0
-    } else if (this.x < 0) {
-      this.x = this.map[0].length * this.size
+  private calculateDistanceToWall(direction: Direction): number {
+    const halfSize = this.size / 2
+    const tolerance = this.size * 0.01
+    let distance = Infinity
+
+    switch (direction) {
+      case 'right': {
+        const edgeX = this.x + halfSize + tolerance
+        const yTop = this.y - halfSize + tolerance
+        const yBottom = this.y + halfSize - tolerance
+
+        const mapYTop = Math.floor(yTop / this.size)
+        const mapYBottom = Math.floor(yBottom / this.size)
+        let mapX = Math.floor(edgeX / this.size)
+
+        while (mapX < this.map[0].length) {
+          const wallX = mapX * this.size
+          const tileTop = this.map[mapYTop]?.[mapX]
+          const tileBottom = this.map[mapYBottom]?.[mapX]
+
+          if (tileTop === 1 || tileBottom === 1) {
+            distance = wallX - edgeX
+            break
+          }
+          mapX++
+        }
+        break
+      }
+      case 'left': {
+        const edgeX = this.x - halfSize - tolerance
+        const yTop = this.y - halfSize + tolerance
+        const yBottom = this.y + halfSize - tolerance
+
+        const mapYTop = Math.floor(yTop / this.size)
+        const mapYBottom = Math.floor(yBottom / this.size)
+        let mapX = Math.floor(edgeX / this.size)
+
+        while (mapX >= 0) {
+          const wallX = (mapX + 1) * this.size
+          const tileTop = this.map[mapYTop]?.[mapX]
+          const tileBottom = this.map[mapYBottom]?.[mapX]
+
+          if (tileTop === 1 || tileBottom === 1) {
+            distance = edgeX - wallX
+            break
+          }
+          mapX--
+        }
+        break
+      }
+      case 'up': {
+        const edgeY = this.y - halfSize - tolerance
+        const xLeft = this.x - halfSize + tolerance
+        const xRight = this.x + halfSize - tolerance
+
+        const mapXLeft = Math.floor(xLeft / this.size)
+        const mapXRight = Math.floor(xRight / this.size)
+        let mapY = Math.floor(edgeY / this.size)
+
+        while (mapY >= 0) {
+          const wallY = (mapY + 1) * this.size
+          const tileLeft = this.map[mapY]?.[mapXLeft]
+          const tileRight = this.map[mapY]?.[mapXRight]
+
+          if (tileLeft === 1 || tileRight === 1) {
+            distance = edgeY - wallY
+            break
+          }
+          mapY--
+        }
+        break
+      }
+      case 'down': {
+        const edgeY = this.y + halfSize + tolerance
+        const xLeft = this.x - halfSize + tolerance
+        const xRight = this.x + halfSize - tolerance
+
+        const mapXLeft = Math.floor(xLeft / this.size)
+        const mapXRight = Math.floor(xRight / this.size)
+        let mapY = Math.floor(edgeY / this.size)
+
+        while (mapY < this.map.length) {
+          const wallY = mapY * this.size
+          const tileLeft = this.map[mapY]?.[mapXLeft]
+          const tileRight = this.map[mapY]?.[mapXRight]
+
+          if (tileLeft === 1 || tileRight === 1) {
+            distance = wallY - edgeY
+            break
+          }
+          mapY++
+        }
+        break
+      }
     }
 
-    if (this.y > this.map.length * this.size) {
+    return Math.max(0, distance)
+  }
+
+  private canChangeDirection(direction: Direction): boolean {
+    const step = this.size * 0.1
+    const directionVector = this.getDirectionVector(direction)
+    const testX = this.x + directionVector.x * step
+    const testY = this.y + directionVector.y * step
+
+    return !this.checkCollision(testX, testY, direction)
+  }
+
+  private getDirectionVector(direction: Direction): { x: number; y: number } {
+    switch (direction) {
+      case 'right':
+        return { x: 1, y: 0 }
+      case 'left':
+        return { x: -1, y: 0 }
+      case 'up':
+        return { x: 0, y: -1 }
+      case 'down':
+        return { x: 0, y: 1 }
+      default:
+        return { x: 0, y: 0 }
+    }
+  }
+
+  private wrapAround(): void {
+    const maxX = this.map[0].length * this.size
+    const maxY = this.map.length * this.size
+
+    if (this.x >= maxX) {
+      this.x = 0
+    } else if (this.x < 0) {
+      this.x = maxX - this.size / 2
+    }
+
+    if (this.y >= maxY) {
       this.y = 0
     } else if (this.y < 0) {
-      this.y = this.map.length * this.size
+      this.y = maxY - this.size / 2
     }
   }
 
   private updateMouthAngle(): void {
     const maxOpenAngle = 0.25
     const minOpenAngle = 0.01
-    const angleStep = 0.01
+    const angleStep = 0.02
 
     if (this.mouthOpening) {
       this.mouthOpenAngle += angleStep
@@ -148,8 +275,9 @@ export class Pacman implements IPacman {
 
   checkCollision(newX: number, newY: number, direction?: Direction): boolean {
     const halfSize = this.size / 2
-    const tolerance = 0.02 * this.size
+    const tolerance = 1
     const dir = direction ?? this.direction
+
     let frontLeftX: number,
       frontLeftY: number,
       frontRightX: number,
@@ -157,28 +285,28 @@ export class Pacman implements IPacman {
 
     switch (dir) {
       case 'right':
-        frontLeftX = newX + halfSize - tolerance
-        frontLeftY = newY - halfSize + 1
-        frontRightX = newX + halfSize - tolerance
-        frontRightY = newY + halfSize - 1
+        frontLeftX = newX + halfSize + tolerance
+        frontLeftY = newY - halfSize + tolerance
+        frontRightX = newX + halfSize + tolerance
+        frontRightY = newY + halfSize - tolerance
         break
       case 'left':
-        frontLeftX = newX - halfSize
-        frontLeftY = newY - halfSize + 1
-        frontRightX = newX - halfSize
-        frontRightY = newY + halfSize - 1
+        frontLeftX = newX - halfSize - tolerance
+        frontLeftY = newY - halfSize + tolerance
+        frontRightX = newX - halfSize - tolerance
+        frontRightY = newY + halfSize - tolerance
         break
       case 'up':
-        frontLeftX = newX - halfSize + 1
-        frontLeftY = newY - halfSize
-        frontRightX = newX + halfSize - 1
-        frontRightY = newY - halfSize
+        frontLeftX = newX - halfSize + tolerance
+        frontLeftY = newY - halfSize - tolerance
+        frontRightX = newX + halfSize - tolerance
+        frontRightY = newY - halfSize - tolerance
         break
       case 'down':
-        frontLeftX = newX - halfSize + 1
-        frontLeftY = newY + halfSize - tolerance
-        frontRightX = newX + halfSize - 1
-        frontRightY = newY + halfSize - tolerance
+        frontLeftX = newX - halfSize + tolerance
+        frontLeftY = newY + halfSize + tolerance
+        frontRightX = newX + halfSize - tolerance
+        frontRightY = newY + halfSize + tolerance
         break
     }
 
@@ -218,36 +346,32 @@ export class Pacman implements IPacman {
   changeDirection(direction: Direction): void {
     if (this.direction === direction) return
     if (!['right', 'left', 'up', 'down'].includes(direction)) return
-    let simulatedX = this.x
-    let simulatedY = this.y
 
-    switch (direction) {
-      case 'right':
-        simulatedX += 0.1 * this.size
-        break
-      case 'left':
-        simulatedX -= this.size / 32
-        break
-      case 'up':
-        simulatedY -= this.size / 32
-        break
-      case 'down':
-        simulatedY += 0.1 * this.size
-        break
-    }
-
-    if (this.checkCollision(simulatedX, simulatedY, direction)) {
+    if (this.canChangeDirection(direction)) {
+      this.alignWithGrid()
+      this.direction = direction
+      this.directionToChangeWhenPossible = null
+    } else {
       this.directionToChangeWhenPossible = direction
-      return
     }
+  }
 
-    this.direction = direction
-    this.directionToChangeWhenPossible = null
+  private alignWithGrid(): void {
+    if (this.direction === 'left' || this.direction === 'right') {
+      this.y =
+        Math.round((this.y - this.size / 2) / this.size) * this.size +
+        this.size / 2
+    } else if (this.direction === 'up' || this.direction === 'down') {
+      this.x =
+        Math.round((this.x - this.size / 2) / this.size) * this.size +
+        this.size / 2
+    }
   }
 
   resetPosition(): void {
     this.x = this.spawnPosition.x * this.size + this.size / 2
     this.y = this.spawnPosition.y * this.size + this.size / 2
     this.direction = 'right'
+    this.directionToChangeWhenPossible = null
   }
 }
