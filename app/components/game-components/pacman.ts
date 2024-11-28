@@ -38,7 +38,7 @@ export class Pacman implements IPacman {
     this.directionToChangeWhenPossible = null
     this.mouthOpenAngle = 0.2
     this.mouthOpening = true
-    this.color = this.id === 1 ? 'yellow' : this.getRandomColor()
+    this.color = "#FFD700"
   }
 
   private findSpawnPosition(map: number[][]): { x: number; y: number } | null {
@@ -69,17 +69,6 @@ export class Pacman implements IPacman {
     )
     ctx.lineTo(this.x, this.y)
     ctx.fill()
-  }
-
-  private getRandomColor(): string {
-    const letters = '0123456789ABCDEF'
-    const color =
-      '#' +
-      Array.from(
-        { length: 6 },
-        () => letters[Math.floor(Math.random() * 16)]
-      ).join('')
-    return color
   }
 
   move(): void {
