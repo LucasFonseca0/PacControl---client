@@ -101,12 +101,17 @@ const MyCanvas: React.FC<MyCanvasProps> = ({ onGameAction }) => {
     }
   }
 
-  const handleGameOver = (ctx: CanvasRenderingContext2D) => {
+  const handleGameOver = (
+    ctx: CanvasRenderingContext2D,
+    setLevel: (level: number) => void
+  ) => {
     if (scoreRef.current > bestScoreRef.current) {
       setBestScore(scoreRef.current)
       bestScoreRef.current = scoreRef.current
       localStorage.setItem('bestScore', String(scoreRef.current))
     }
+
+    setLevel(1)
 
     drawGameOver(
       ctx,
@@ -196,7 +201,7 @@ const MyCanvas: React.FC<MyCanvasProps> = ({ onGameAction }) => {
       if (livesRef.current > 0) {
         animationFrameIdRef.current = requestAnimationFrame(render)
       } else {
-        handleGameOver(ctx)
+        handleGameOver(ctx, setLevel)
       }
     }
   }, [
