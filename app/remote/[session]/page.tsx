@@ -20,7 +20,6 @@ export default function RemoteControl({
 
   const serverURL = process.env.NEXT_PUBLIC_SERVER_URL as string
 
-
   useEffect(() => {
     const socket = io(serverURL, {
       withCredentials: true,
@@ -28,13 +27,7 @@ export default function RemoteControl({
       transports: ['websocket'],
     })
 
-    console.log('Conectado ao WebSocket com sessionId:', params.session)
-
     socket.emit('startGame', { sessionId: params.session })
-
-    socket.on('gameAction', (action) => {
-      console.log(`Ação recebida: ${action}`)
-    })
 
     socketRef.current = socket
 
@@ -42,7 +35,7 @@ export default function RemoteControl({
       socket.disconnect()
     }
   }, [params.session, serverURL])
- 
+
   useEffect(() => {
     if (joystickRef.current) {
       const joystick = nipplejs.create({

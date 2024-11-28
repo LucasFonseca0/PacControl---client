@@ -260,7 +260,6 @@ const MyCanvas: React.FC<MyCanvasProps> = ({ onGameAction }) => {
     if (onGameAction) {
       if (livesRef.current > 0 && pacmanRef.current) {
         pacmanRef.current.changeDirection(onGameAction)
-        console.log(level, config)
       } else if (livesRef.current <= 0) {
         resetGame()
       }

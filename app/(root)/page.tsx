@@ -28,22 +28,20 @@ export default function Home() {
     setSocket(newSocket)
 
     newSocket.on('connect', () => {
-      console.log('Conectado ao WebSocket com sessionId:', sessionId)
+      console.log('connect with ID:', sessionId)
       console.log('Link:', `${clientURL}/remote/${sessionId}`)
     })
 
     newSocket.on('gameStarted', () => {
-      console.log('O jogo começou!')
       setGameStarted(true)
     })
 
     newSocket.on('gameAction', (data: Actions) => {
-      console.log('Resposta do backend (pong):', data)
       setGameAction(data)
     })
 
     newSocket.on('disconnect', () => {
-      console.log('Desconectado do WebSocket')
+      console.log('desconnect from server')
     })
 
     return () => {
@@ -57,7 +55,7 @@ export default function Home() {
         {!gameStarted ? (
           <div className="text-center min-h-[60vh] flex flex-col items-center justify-center p-20">
             <h1 className="text-2xl font-bold mb-4 text-white">
-              Escaneie o QR Code para começar o jogo
+              Scan the QR Code to start the game
             </h1>
             <QRCode
               value={`${clientURL}/remote/${sessionId}`}
