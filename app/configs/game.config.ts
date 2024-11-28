@@ -15,7 +15,7 @@ export const getGameConfig = ({ pacmanMap }: { pacmanMap: number[][] }) => {
       vulnerableTime: 600,
     },
     pacman: {
-      speed: 3,
+      speed: 2,
     },
     scoring: {
       normalPellet: 10,
