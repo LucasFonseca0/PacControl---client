@@ -1,36 +1,190 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Pac-Man Arcade Game with Mobile Controller
 
-## Getting Started
+An implementation of the classic Pac-Man game using React and Canvas, allowing players to use their mobile devices as remote controllers via QR code scanning.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Classic Pac-Man Gameplay**: Enjoy the nostalgic feel of the original Pac-Man game.
+- **Web-Based**: Play directly in your browser without any additional installations.
+- **Mobile Remote Controller**: Scan a QR code to connect your mobile device and control the game.
+- **Responsive Joystick Controls**: Smooth and intuitive controls using the nipplejs joystick library.
+- **Real-Time Communication**: Seamless interaction between the game and controller using Socket.IO.
+- **Multiple Levels**: Progress through levels with increasing difficulty.
+
+## Prerequisites
+
+- **Node.js**: Ensure you have Node.js installed (version 14 or higher recommended).
+- **npm or yarn**: Package manager for installing dependencies.
+
+## Installation
+
+1. **Clone the Repository**
+
+   ```bash
+   git clone https://github.com/yourusername/pacman-arcade-game.git
+   cd pacman-arcade-game
+   ```
+
+2. **Install Dependencies**
+
+   Using npm:
+
+   ```bash
+   npm install
+   ```
+
+   Or using yarn:
+
+   ```bash
+   yarn install
+   ```
+
+     Or using pnpm:
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Environment Variables**
+
+   - **Create a `.env` File**
+
+     Create a `.env` file in the root directory of the project. You can use the provided `.env.example` file as a reference.
+
+     ```bash
+     cp .env.example .env
+     ```
+
+   - **Configure Environment Variables**
+
+     Open the `.env` file and configure the environment variables as needed:
+
+     ```bash
+     NEXT_PUBLIC_SERVER_URL="http://localhost:3001"
+     NEXT_PUBLIC_CLIENT_URL="http://localhost:3000"
+     ```
+
+     - `NEXT_PUBLIC_SERVER_URL`: The URL where your Socket.IO server is running.
+     - `NEXT_PUBLIC_CLIENT_URL`: The URL where your Next.js client application is running.
+
+     **Note**: Ensure that these URLs match your development or production setup.
+
+4. **Start the Development Server**
+
+   Using npm:
+
+   ```bash
+   npm run dev
+   ```
+
+   Or using yarn:
+
+   ```bash
+   yarn dev
+   ```
+
+    Or using pnpm:
+
+   ```bash
+   pnpm dev
+   ```
+
+   The application should now be running at `http://localhost:3000`.
+
+## Usage
+
+1. **Open the Game**
+
+   Navigate to `http://localhost:3000` in your browser.
+
+2. **Start the Game**
+
+   - A QR code will be displayed on the screen.
+   - Scan the QR code using your mobile device to open the remote controller.
+
+3. **Control the Game**
+
+   - Use the on-screen joystick or directional buttons on your mobile device to control Pac-Man.
+   - The game will respond to your inputs in real-time.
+
+4. **Gameplay**
+
+   - Collect all the pellets to advance to the next level.
+   - Avoid the ghosts, or collect a power pellet to turn the tables.
+   - Try to achieve the highest score possible!
+
+## Project Structure
+
+- **components/**: Contains React components for the game, including Pac-Man, Ghosts, Pellets, and the game canvas.
+- **pages/**: Next.js pages, including the main game page and the remote controller page.
+- **utils/**: Utility functions for game logic and canvas rendering.
+- **configs/**: Game configuration files, including levels and settings.
+- **public/**: Static assets like images and sprites.
+- **.env.example**: Example environment variables file.
+
+## Dependencies
+
+The project relies on the following dependencies:
+
+```json
+{
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "next": "14.2.5",
+    "nipplejs": "^0.10.2",
+    "qrcode.react": "^3.1.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "socket.io-client": "^4.7.5",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **@heroicons/react**: For icon components used in the UI.
+- **next**: The Next.js framework for server-side rendering and routing.
+- **nipplejs**: Joystick library for mobile controls.
+- **qrcode.react**: For generating QR codes in React.
+- **react** and **react-dom**: Core React libraries.
+- **socket.io-client**: For real-time communication between the game and the controller.
+- **uuid**: For generating unique session IDs.
+- **TypeScript** and related **@types** packages: For type checking and improved code quality.
+- **ESLint** and **eslint-config-next**: For linting and maintaining code style.
+- **Tailwind CSS** and **PostCSS**: For styling and responsive design.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Technologies Used
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **React**: For building the user interface.
+- **Next.js**: Framework for server-side rendering and routing.
+- **TypeScript**: Typed JavaScript for improved code quality.
+- **Socket.IO**: Real-time communication between the game and the remote controller.
+- **nipplejs**: Joystick library for mobile controls.
+- **Canvas API**: For rendering the game graphics.
+- **QR Code**: Generating QR codes for mobile device connection.
+- **Tailwind CSS**: Utility-first CSS framework for styling.
 
-## Learn More
+## Contributing
 
-To learn more about Next.js, take a look at the following resources:
+Contributions are welcome! If you'd like to contribute, please fork the repository and make changes as you'd like. Pull requests are warmly appreciated.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+This project is licensed under the MIT License
 
-## Deploy on Vercel
+## Acknowledgments
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- Inspired by the original **Pac-Man** game.
+- **Socket.IO** for enabling real-time communication.
+- **nipplejs** for providing joystick controls on mobile devices.
+- **Next.js** for the robust React framework.
