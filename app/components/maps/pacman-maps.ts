@@ -1,3 +1,14 @@
+/* 
+* 0= empty space
+* 1= wall
+* 2= pellet
+* 3= pink wall
+* 4= ghost house
+* 5- pacman spawn
+* 6= power pellet
+* 
+**/ 
+
 export const defaultPacmanMap = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 6, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 6, 1],
