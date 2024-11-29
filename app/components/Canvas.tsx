@@ -213,6 +213,7 @@ const MyCanvas: React.FC<MyCanvasProps> = ({ onGameAction }) => {
     scoring.normalPellet,
     scoring.powerPellet,
     bestScore,
+    level,
   ])
 
   useEffect(() => {
