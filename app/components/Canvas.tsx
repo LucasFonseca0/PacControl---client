@@ -42,6 +42,7 @@ const MyCanvas: React.FC<MyCanvasProps> = ({ onGameAction }) => {
   const [score, setScore] = useState(0)
   const [level, setLevel] = useState(1)
   const [lives, setLives] = useState(initialLives)
+  const [canReset, setCanReset] = useState(false)
   const [bestScore, setBestScore] = useState(() => {
     const savedBestScore = localStorage.getItem('bestScore')
     return savedBestScore ? Number(savedBestScore) : 0
@@ -120,6 +121,9 @@ const MyCanvas: React.FC<MyCanvasProps> = ({ onGameAction }) => {
       canvasWidth,
       canvasHeight
     )
+    setTimeout(() => {
+      setCanReset(true)
+    }, 1500)
     animationFrameIdRef.current = null
   }
 
@@ -266,8 +270,9 @@ const MyCanvas: React.FC<MyCanvasProps> = ({ onGameAction }) => {
     if (onGameAction) {
       if (livesRef.current > 0 && pacmanRef.current) {
         pacmanRef.current.changeDirection(onGameAction)
-      } else if (livesRef.current <= 0) {
+      } else if (livesRef.current <= 0 && canReset) {
         resetGame()
+        setCanReset(false)
       }
     }
   }, [onGameAction, initialLives, bestScore])
