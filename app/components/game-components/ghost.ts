@@ -407,7 +407,7 @@ export class Ghost implements IGhost {
   }
 
   private isNearIntersection(): boolean {
-    const tolerance = this.stepSize
+    const tolerance = this.stepSize *0.01
     const remainderX = Math.abs((this.x % this.size) - this.halfSize)
     const remainderY = Math.abs((this.y % this.size) - this.halfSize)
     return remainderX < tolerance && remainderY < tolerance
@@ -540,7 +540,7 @@ export class Ghost implements IGhost {
   }
 
   private checkCollision(newX: number, newY: number): boolean {
-    const tolerance = 0.02 * this.stepSize
+    const tolerance = 0.01 * this.size
 
     const positions = [
       {
