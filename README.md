@@ -37,7 +37,7 @@ An implementation of the classic Pac-Man game using React and Canvas, allowing p
 1. **Clone the Repository**
 
    ```bash
-   https://github.com/LucasFonseca0/PacControl---client.git
+   git clone https://github.com/LucasFonseca0/PacControl---client.git
    cd PacControl---client
    ```
 
