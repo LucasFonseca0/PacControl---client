@@ -109,7 +109,7 @@ export default function Home() {
                   The server is starting up, please wait...
                 </h1>
                 <p className="text-white mb-4">
-                  The server is hosted on Render&apos;s free tier, so it's
+                  The server is hosted on Render&apos;s free tier, so it&apos;ss
                   common for it to sleep until it receives a request.
                 </p>
                 <p className="text-white mb-4">
