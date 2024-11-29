@@ -2,6 +2,22 @@
 
 An implementation of the classic Pac-Man game using React and Canvas, allowing players to use their mobile devices as remote controllers via QR code scanning.
 
+<div align="center">
+  <figure>
+    <img src="https://github.com/user-attachments/assets/b05a0b05-3dcf-43d4-8f70-db4943de0431" alt="Game Screenshot 1" width="300"/>
+  </figure>
+  <figure>
+    <img src="https://github.com/user-attachments/assets/c590f7a0-1eeb-4dbb-8146-ca451ad12614" alt="Game Screenshot 2" width="300"/>
+  </figure>
+  <figure>
+    <img src="https://github.com/user-attachments/assets/7394c9e3-658f-4e7e-80c5-0468a7efa11f" alt="Game Screenshot 3" width="300"/>
+  </figure>
+</div>
+
+### Deploy: https://pacman-remote.vercel.app/
+
+
+
 ## Features
 
 - **Classic Pac-Man Gameplay**: Enjoy the nostalgic feel of the original Pac-Man game.
