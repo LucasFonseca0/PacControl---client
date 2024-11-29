@@ -37,8 +37,8 @@ An implementation of the classic Pac-Man game using React and Canvas, allowing p
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/pacman-arcade-game.git
-   cd pacman-arcade-game
+   https://github.com/LucasFonseca0/PacControl---client.git
+   cd PacControl---client
    ```
 
 2. **Install Dependencies**
