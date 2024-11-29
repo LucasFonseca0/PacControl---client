@@ -74,7 +74,7 @@ export default function RemoteControl({
     'w-14 h-14 bg-red-500 rounded-full shadow-lg border-4 border-gray-700 hover:bg-red-600 focus:outline-none flex items-center justify-center transition-transform duration-100 active:scale-95'
 
   return (
-    <div className="flex items-center justify-center  bg-gray-800 h-[100dvh] w-[100dvw] p-2">
+    <div className="flex items-center justify-around  bg-gray-800 h-[100dvh] w-[100dvw] p-2">
       <div
         className="mr-32 flex flex-col items-center"
         style={{ width: 150, height: 150 }}
