@@ -16,8 +16,6 @@ An implementation of the classic Pac-Man game using React and Canvas, allowing p
 
 ### Deploy: https://pacman-remote.vercel.app/
 
-
-
 ## Features
 
 - **Classic Pac-Man Gameplay**: Enjoy the nostalgic feel of the original Pac-Man game.
@@ -26,6 +24,15 @@ An implementation of the classic Pac-Man game using React and Canvas, allowing p
 - **Responsive Joystick Controls**: Smooth and intuitive controls using the nipplejs joystick library.
 - **Real-Time Communication**: Seamless interaction between the game and controller using Socket.IO.
 - **Multiple Levels**: Progress through levels with increasing difficulty.
+
+## Pathfinding Algorithm: A\*
+
+The ghost movement leverages the A\* algorithm for pathfinding, ensuring efficient and accurate navigation. It uses:
+
+Manhattan Distance: A heuristic to estimate the shortest path to the target.
+Open and Closed Lists: To track explored and unexplored nodes.
+Grid-Based Navigation: Perfectly suited for the Pac-Man game environment.
+This implementation ensures ghosts dynamically adapt to Pac-Man's movements, creating a challenging and engaging gameplay experience
 
 ## Prerequisites
 
@@ -55,7 +62,7 @@ An implementation of the classic Pac-Man game using React and Canvas, allowing p
    yarn install
    ```
 
-     Or using pnpm:
+   Or using pnpm:
 
    ```bash
    pnpm install
@@ -99,7 +106,7 @@ An implementation of the classic Pac-Man game using React and Canvas, allowing p
    yarn dev
    ```
 
-    Or using pnpm:
+   Or using pnpm:
 
    ```bash
    pnpm dev
