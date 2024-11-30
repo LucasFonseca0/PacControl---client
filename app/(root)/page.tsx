@@ -9,19 +9,69 @@ import { ArcadeBackground } from '../components/ArcadeBackground'
 
 type Actions = 'left' | 'right' | 'up' | 'down'
 
+const MobileMessage = () => (
+  <div className="flex flex-col items-center justify-center min-h-80">
+    <h1 className="text-2xl font-bold mb-4 text-white">
+      Please use a device with a larger screen to access this content.
+    </h1>
+  </div>
+)
+
+const ServerStarting = ({ timeRemaining }: { timeRemaining: number }) => (
+  <div className="text-center min-h-[60vh] flex flex-col items-center justify-center p-20">
+    <h1 className="text-2xl font-bold mb-4 text-white">
+      The server is starting up, please wait...
+    </h1>
+    <p className="text-white mb-4">
+      The server is hosted on Render's free tier, so it's common for it to sleep
+      until it receives a request.
+    </p>
+    <p className="text-white mb-4">Estimated time: {timeRemaining} seconds</p>
+  </div>
+)
+
+const QRCodeDisplay = ({ value }: { value: string }) => (
+  <div className="text-center min-h-[60vh] flex flex-col items-center justify-center p-20">
+    <h1 className="text-2xl font-bold mb-4 text-white">
+      Scan the QR Code to start the game
+    </h1>
+    <QRCode value={value} className="m-auto border-2" size={300} />
+  </div>
+)
+
+const GameCanvas = ({ onGameAction }: { onGameAction: Actions }) => (
+  <div className="text-center">
+    <MyCanvas onGameAction={onGameAction} />
+  </div>
+)
+
 export default function Home() {
   const [gameStarted, setGameStarted] = useState(false)
   const [sessionId] = useState(uuidv4())
-  const [socket, setSocket] = useState<any>(null)
   const [gameAction, setGameAction] = useState<Actions>('right')
   const [serverStarting, setServerStarting] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(30)
 
   const reconnectInterval = useRef<NodeJS.Timeout | null>(null)
   const timerInterval = useRef<NodeJS.Timeout | null>(null)
+  const timeLeftRef = useRef(30)
 
   const serverURL = process.env.NEXT_PUBLIC_SERVER_URL as string
   const clientURL = process.env.NEXT_PUBLIC_CLIENT_URL as string
+
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const updateIsMobile = () => {
+      setIsMobile(window.innerWidth <= 760)
+    }
+
+    updateIsMobile()
+    window.addEventListener('resize', updateIsMobile)
+    return () => {
+      window.removeEventListener('resize', updateIsMobile)
+    }
+  }, [])
 
   useEffect(() => {
     const newSocket = io(serverURL, {
@@ -31,20 +81,26 @@ export default function Home() {
       reconnection: false,
     })
 
-    setSocket(newSocket)
+    const clearReconnectInterval = () => {
+      if (reconnectInterval.current) {
+        clearInterval(reconnectInterval.current)
+        reconnectInterval.current = null
+      }
+    }
+
+    const clearTimerInterval = () => {
+      if (timerInterval.current) {
+        clearInterval(timerInterval.current)
+        timerInterval.current = null
+      }
+    }
 
     newSocket.on('connect', () => {
       console.log('Connected with ID:', sessionId)
       console.log('Link:', `${clientURL}/remote/${sessionId}`)
       setServerStarting(false)
-      if (reconnectInterval.current) {
-        clearInterval(reconnectInterval.current)
-        reconnectInterval.current = null
-      }
-      if (timerInterval.current) {
-        clearInterval(timerInterval.current)
-        timerInterval.current = null
-      }
+      clearReconnectInterval()
+      clearTimerInterval()
     })
 
     newSocket.on('gameStarted', () => {
@@ -59,10 +115,11 @@ export default function Home() {
       console.log('Disconnected from server')
     })
 
-    newSocket.on('connect_error', (err: any) => {
+    newSocket.on('connect_error', (err: Error) => {
       console.log('Connection error:', err)
       setServerStarting(true)
-      let timeLeft = 30
+      timeLeftRef.current = 30
+      setTimeRemaining(timeLeftRef.current)
 
       if (!reconnectInterval.current) {
         reconnectInterval.current = setInterval(() => {
@@ -73,13 +130,10 @@ export default function Home() {
 
       if (!timerInterval.current) {
         timerInterval.current = setInterval(() => {
-          timeLeft -= 1
-          setTimeRemaining(timeLeft)
-          if (timeLeft <= 0) {
-            if (timerInterval.current) {
-              clearInterval(timerInterval.current)
-              timerInterval.current = null
-            }
+          timeLeftRef.current -= 1
+          setTimeRemaining(timeLeftRef.current)
+          if (timeLeftRef.current <= 0) {
+            clearTimerInterval()
           }
         }, 1000)
       }
@@ -87,54 +141,24 @@ export default function Home() {
 
     return () => {
       newSocket.disconnect()
-      if (reconnectInterval.current) {
-        clearInterval(reconnectInterval.current)
-        reconnectInterval.current = null
-      }
-      if (timerInterval.current) {
-        clearInterval(timerInterval.current)
-        timerInterval.current = null
-      }
+      clearReconnectInterval()
+      clearTimerInterval()
     }
-  }, [sessionId, serverURL])
+  }, [sessionId, serverURL, clientURL])
 
   return (
     <ArcadeBackground>
-      <div className="flex flex-col items-center justify-center min-h-80 ">
-        {!gameStarted ? (
-          <div className="text-center min-h-[60vh] flex flex-col items-center justify-center p-20">
-            {serverStarting ? (
-              <>
-                <h1 className="text-2xl font-bold mb-4 text-white">
-                  The server is starting up, please wait...
-                </h1>
-                <p className="text-white mb-4">
-                  The server is hosted on Render&apos;s free tier, so it&apos;s
-                  common for it to sleep until it receives a request.
-                </p>
-                <p className="text-white mb-4">
-                  Estimated time: {timeRemaining} seconds
-                </p>
-              </>
-            ) : (
-              <>
-                <h1 className="text-2xl font-bold mb-4 text-white">
-                  Scan the QR Code to start the game
-                </h1>
-                <QRCode
-                  value={`${clientURL}/remote/${sessionId}`}
-                  className="m-auto border-2 "
-                  size={300}
-                />
-              </>
-            )}
-          </div>
+      {isMobile ? (
+        <MobileMessage />
+      ) : !gameStarted ? (
+        serverStarting ? (
+          <ServerStarting timeRemaining={timeRemaining} />
         ) : (
-          <div className="text-center">
-            <MyCanvas onGameAction={gameAction} />
-          </div>
-        )}
-      </div>
+          <QRCodeDisplay value={`${clientURL}/remote/${sessionId}`} />
+        )
+      ) : (
+        <GameCanvas onGameAction={gameAction} />
+      )}
     </ArcadeBackground>
   )
 }
