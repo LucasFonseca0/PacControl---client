@@ -8,7 +8,7 @@ const pressStart2P = Press_Start_2P({
 })
 
 export const metadata: Metadata = {
-  title: 'Pacmnan - remote control',
+  title: 'Pacman - remote control',
   description: 'Pacman game with remote control',
 }
 
