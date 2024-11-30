@@ -23,8 +23,8 @@ const ServerStarting = ({ timeRemaining }: { timeRemaining: number }) => (
       The server is starting up, please wait...
     </h1>
     <p className="text-white mb-4">
-      The server is hosted on Render's free tier, so it's common for it to sleep
-      until it receives a request.
+      The server is hosted on Render&apos;s free tier, so it&apos;s common for
+      it to sleep until it receives a request.
     </p>
     <p className="text-white mb-4">Estimated time: {timeRemaining} seconds</p>
   </div>
