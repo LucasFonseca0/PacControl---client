@@ -113,6 +113,7 @@ const MyCanvas: React.FC<MyCanvasProps> = ({ onGameAction }) => {
     }
 
     setLevel(1)
+    setConfig(getGameConfig({ pacmanMap: defaultPacmanMap }))
 
     drawGameOver(
       ctx,
